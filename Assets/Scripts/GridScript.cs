@@ -14,7 +14,7 @@ public class GridScript : MonoBehaviour
     // Public config
     public int width = 40;
     public int height = 40;
-    public float tileSize = 0.1f;
+    public float tileSize = 0.05f;
 
     // Timing
     public float initialMovementTimeInterval = 1.0f;
@@ -28,6 +28,7 @@ public class GridScript : MonoBehaviour
     public Transform survivorPrefab;
     public Transform zombiePrefab;
 
+	public MenuControl menuControl;
 
     ////////////////////////////////////////////////////////////////////
     // Private values
@@ -126,23 +127,24 @@ public class GridScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (m_pCongaHeadSurvivor)
-        {
-            mainCamera.transform.position.Set(m_pCongaHeadSurvivor.transform.position.x, m_pCongaHeadSurvivor.transform.position.y, mainCamera.transform.position.z);
-        }
+		if (m_scriptCongoHead.isDead) {
+			menuControl.ShowGameOverMenu ();
+		} else {
+			if (m_pCongaHeadSurvivor) {
+				mainCamera.transform.position.Set (m_pCongaHeadSurvivor.transform.position.x, m_pCongaHeadSurvivor.transform.position.y, mainCamera.transform.position.z);
+			}
 
-        PollInput();
+			PollInput ();
 
-        if (m_fMovementUpdateCountdown > 0.0f)
-        {
-            m_fMovementUpdateCountdown -= Time.deltaTime;
+			if (m_fMovementUpdateCountdown > 0.0f) {
+				m_fMovementUpdateCountdown -= Time.deltaTime;
 
-            if (m_fMovementUpdateCountdown <= 0.0f)
-            {
-                OnMovementUpdate();
-                ResetMovementUpdateCountdown();
-            }
-        }
+				if (m_fMovementUpdateCountdown <= 0.0f) {
+					OnMovementUpdate ();
+					ResetMovementUpdateCountdown ();
+				}
+			}
+		}
 
         //// Loop through all grid objects
         //int children = transform.childCount;

@@ -11,6 +11,7 @@ public enum ESurvivorState
 public class SurvivorScript : GridObject 
 {
     public GameObject gridObject;
+	public bool isDead = false;
 
     // The state of the survivor
     ESurvivorState m_eState = ESurvivorState.Stranded;
@@ -73,22 +74,27 @@ public class SurvivorScript : GridObject
 	}
 
 	void OnCollisionEnter2D(Collision2D coll) {
-		if (gameObject.tag == "Player" && coll.gameObject.tag == "Survivor") {
-			GameObject link = survivorBack;
-			
-			if (link == null) {
-				//AddSurvivor(coll.gameObject);
-			}
-			else {
-				while (true) {
-					if (link.GetComponent<SurvivorScript>().survivorBack == null) {
-						break;
+		if (gameObject.tag == "Player") {
+			if(coll.gameObject.tag == "Survivor") {
+				GameObject link = survivorBack;
+				
+				if (link == null) {
+					AddSurvivor(coll.gameObject);
+				}
+				else {
+					while (true) {
+						if (link.GetComponent<SurvivorScript>().survivorBack == null) {
+							break;
+						}
+
+						link = link.GetComponent<SurvivorScript>().survivorBack;
 					}
 
-					link = link.GetComponent<SurvivorScript>().survivorBack;
+					link.GetComponent<SurvivorScript>().AddSurvivor(coll.gameObject);
 				}
-
-				//link.GetComponent<SurvivorScript>().AddSurvivor(coll.gameObject);
+			}
+			else if (coll.gameObject.tag == "Zombie") {
+				isDead = true;
 			}
 		}
 	}

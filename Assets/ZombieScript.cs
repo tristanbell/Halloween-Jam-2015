@@ -69,20 +69,20 @@ public class ZombieScript : GridObject {
 		transform.localPosition = new Vector3(newPos.x, newPos.y, 0);
 
         // Set the animation
-        //switch (m_pMovementComponent.GetDirection())
-        //{
-        //    case EDirection.DOWN:
-        //        animator.SetInteger("Direction", 0);
-        //        break;
-        //    case EDirection.LEFT:
-        //        animator.SetInteger("Direction", 1);
-        //        break;
-        //    case EDirection.UP:
-        //        animator.SetInteger("Direction", 2);
-        //        break;
-        //    case EDirection.RIGHT:
-        //        animator.SetInteger("Direction", 3);
-        //        break;
-        //}
+        switch (m_pMovementComponent.GetDirection())
+        {
+            case EDirection.DOWN:
+                animator.SetInteger("Direction", 0);
+                break;
+            case EDirection.LEFT:
+                animator.SetInteger("Direction", 1);
+                break;
+            case EDirection.UP:
+                animator.SetInteger("Direction", 2);
+                break;
+            case EDirection.RIGHT:
+                animator.SetInteger("Direction", 3);
+                break;
+        }
     }
 }
