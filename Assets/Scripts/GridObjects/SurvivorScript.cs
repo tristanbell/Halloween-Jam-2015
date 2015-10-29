@@ -16,7 +16,6 @@ public class SurvivorScript : GridObject
     ESurvivorState m_eState = ESurvivorState.Stranded;
 
     // A conga line of survivors have a front and back survivor pointer
-    GameObject survivorFront = null;
     GameObject survivorBack = null;
 
 	protected Animator animator;
@@ -66,10 +65,6 @@ public class SurvivorScript : GridObject
 		}
 
         // On Movement
-        if (survivorFront)
-        {
-            //m_vNextPosition = survivorFront.GetGridPosition();
-        }
         if (survivorBack)
         {
             
@@ -82,7 +77,7 @@ public class SurvivorScript : GridObject
 			GameObject link = survivorBack;
 			
 			if (link == null) {
-				AddSurvivor(coll.gameObject);
+				//AddSurvivor(coll.gameObject);
 			}
 			else {
 				while (true) {
@@ -93,7 +88,7 @@ public class SurvivorScript : GridObject
 					link = link.GetComponent<SurvivorScript>().survivorBack;
 				}
 
-				link.GetComponent<SurvivorScript>().AddSurvivor(coll.gameObject);
+				//link.GetComponent<SurvivorScript>().AddSurvivor(coll.gameObject);
 			}
 		}
 	}
@@ -118,7 +113,7 @@ public class SurvivorScript : GridObject
 			break;
 		}
 
-		survivorBack.GetComponent<SurvivorScript>().m_pMovementComponent.SetPosition (new Vector2(0, 0));
+		survivorBack.GetComponent<SurvivorScript>().m_pMovementComponent.SetPosition (backPos);
 		survivorBack.GetComponent<SurvivorScript>().m_pMovementComponent.SetDirection (m_pMovementComponent.GetDirection ());
 	}
 }

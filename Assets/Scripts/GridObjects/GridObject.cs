@@ -8,7 +8,7 @@ public class GridObject : MonoBehaviour
 	// Use this for initialization
 	protected void Start()
     {
-        m_pMovementComponent = gameObject.AddComponent<MovementComponent>();
+        m_pMovementComponent = GetComponent<MovementComponent>();
 	}
 
     public void DoMovement()
