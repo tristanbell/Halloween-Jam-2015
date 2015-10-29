@@ -78,7 +78,7 @@ public class GridScript : MonoBehaviour
         }
 
         // Add the player to the center
-        Vector2 vPlayerSpawnPosition = spawnPlayerInCentre ? new Vector2(width / 2, height / 2) : playerStartPositionOverride;
+		Vector2 vPlayerSpawnPosition = new Vector2 (0, 0);// spawnPlayerInCentre ? new Vector2(width / 2, height / 2) : playerStartPositionOverride;
         m_pCongaHeadSurvivor = (Transform) Instantiate(survivorPrefab, GridToRenderPosition(vPlayerSpawnPosition), Quaternion.identity);
         m_scriptCongoHead = m_pCongaHeadSurvivor.GetComponent<SurvivorScript>();
     }

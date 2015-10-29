@@ -41,6 +41,11 @@ public class MovementComponent : MonoBehaviour {
         m_eMovementDirection = i_eNewDirection;
     }
 
+	public EDirection GetDirection()
+	{
+		return m_eMovementDirection;
+	}
+
     private void Move(EDirection m_eMovementDirection)
     {
         switch (m_eMovementDirection)
