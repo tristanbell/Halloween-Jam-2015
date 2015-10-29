@@ -3,9 +3,11 @@ using System.Collections;
 
 public class Game : MonoBehaviour {
 
+    public Transform grid;
 
 	// Use this for initialization
-	void Start () {
+	void Start () 
+    {
 	
 	}
 

@@ -8,12 +8,15 @@ public class GridObject : MonoBehaviour
 	// Use this for initialization
 	void Start () 
     {
-	    
 	}
+
+    public MovementComponent GetMovementComponent()
+    {
+        return m_pMovementComponent;
+    }
 	
 	// Update is called once per frame
 	void Update () 
     {
-	    
 	}
 }

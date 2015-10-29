@@ -30,6 +30,16 @@ public class SurvivorScript : GridObject
 	// Update is called once per frame
 	void Update () 
     {
+        // On Movement
+        m_pMovementComponent.DoMovement();
+        if (survivorFront)
+        {
+            //m_vNextPosition = survivorFront.GetGridPosition();
+        }
+        if (survivorBack)
+        {
+            
+        }
         
 	}
 }
