@@ -62,7 +62,7 @@ public class GridScript : MonoBehaviour
         ResetMovementUpdateCountdown();
 
 		// create collision texture
-		collision_texture = Resources.Load("male_survivor_sprite_sheet") as Texture2D;
+		collision_texture = Resources.Load("collision") as Texture2D;
 		print (collision_texture);
 
         // Populate grid with grass sprites
