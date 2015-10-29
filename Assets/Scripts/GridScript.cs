@@ -80,8 +80,6 @@ public class GridScript : MonoBehaviour
 		m_pCongaHeadSurvivor.tag = "Player";
         m_scriptCongoHead = m_pCongaHeadSurvivor.GetComponent<SurvivorScript>();
 
-		Transform thing = (Transform) Instantiate(survivorPrefab, GridToRenderPosition(new Vector2(0, -3)), Quaternion.identity);
-		thing.GetComponent<SurvivorScript> ().gridObject = gameObject;
 		SpawnSurvivor ();
     }
 
@@ -91,14 +89,13 @@ public class GridScript : MonoBehaviour
 		int pos_y = Random.Range(0, height);
 		Vector2 survivorSpawnPosition = new Vector2 (pos_x, pos_y);
 		survivorInGame = (Transform) Instantiate(survivorPrefab, GridToRenderPosition(survivorSpawnPosition), Quaternion.identity);
-		survivorInGame.parent = gameObject.transform;
+		survivorInGame.GetComponent<SurvivorScript> ().gridObject = gameObject;
 	}
 
     void ResetMovementUpdateCountdown()
     {
         // Reset to currnet time interval
         m_fMovementUpdateCountdown = m_fMovementUpdateInterval;
-        //print(m_fMovementUpdateInterval);
     }
 
     void SetTransformPosition(Transform i_childTransform)
@@ -109,7 +106,6 @@ public class GridScript : MonoBehaviour
     public Vector2 GridToRenderPosition(Vector2 i_vGridPosition)
     {
         Vector2 result = new Vector2(transform.position.x, transform.position.y) + i_vGridPosition * tileSize;
-		print (result);
 		return result;
     }
 
