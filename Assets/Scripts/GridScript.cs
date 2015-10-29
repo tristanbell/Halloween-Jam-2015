@@ -1,12 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-// Configuration numbers for the grid
-class GridConfig
-{
-    
-}
-
 public class GridScript : MonoBehaviour 
 {
 
@@ -14,10 +8,13 @@ public class GridScript : MonoBehaviour
     // Public values
     ////////////////////////////////////////////////////////////////////
 
+    // Camera
+    public Camera mainCamera;
+
     // Public config
     public int width = 40;
     public int height = 40;
-    public int tileSize = 32;
+    public float tileSize = 0.1f;
 
     // Timing
     public float initialMovementTimeInterval = 1.0f;
@@ -41,28 +38,22 @@ public class GridScript : MonoBehaviour
     private Transform m_pCongaHeadSurvivor;
     private SurvivorScript m_scriptCongoHead;
 
+    
+
     // Countdown to movement update
     private float m_fMovementUpdateInterval;
     private float m_fMovementUpdateCountdown;
 
     // TODO Add an "Add" function, which will take a grid position and add instantiate a prefab at that position
 
-    public Transform brick;
-
-    void foo()
-    {
-        for (int y = 0; y < 5; y++)
-        {
-            for (int x = 0; x < 5; x++)
-            {
-                Instantiate(brick, new Vector2(x, y), Quaternion.identity);
-            }
-        }
-    }
-
     // Use this for initialization
     void Start()
     {
+        // Init camera
+        Vector2 cameraPosition = GridToRenderPosition(new Vector2(width / 2, height / 2));
+        mainCamera.transform.position.Set(cameraPosition.x, cameraPosition.y, 0);
+        mainCamera.orthographicSize = width / 4;
+
         // Set the movement countdown to the initial value
         m_fMovementUpdateInterval = initialMovementTimeInterval;
         ResetMovementUpdateCountdown();
@@ -73,13 +64,14 @@ public class GridScript : MonoBehaviour
         {
             for (int j = 0; j < height; j++)
             {
-                m_pFloorSprites[i,j] = Instantiate(grassPrefab, GridToRenderPosition(new Vector2(i, j)), Quaternion.identity);
+                //m_pFloorSprites[i, j] = Instantiate(grassPrefab, GridToRenderPosition(new Vector2(i, j)), Quaternion.identity);
             }
         }
 
         // Add the player to the center
 		Vector2 vPlayerSpawnPosition = new Vector2 (0, 0);// spawnPlayerInCentre ? new Vector2(width / 2, height / 2) : playerStartPositionOverride;
         m_pCongaHeadSurvivor = (Transform) Instantiate(survivorPrefab, GridToRenderPosition(vPlayerSpawnPosition), Quaternion.identity);
+        m_pCongaHeadSurvivor.parent = gameObject.transform;
         m_scriptCongoHead = m_pCongaHeadSurvivor.GetComponent<SurvivorScript>();
     }
 
@@ -87,6 +79,7 @@ public class GridScript : MonoBehaviour
     {
         // Reset to currnet time interval
         m_fMovementUpdateCountdown = m_fMovementUpdateInterval;
+        print(m_fMovementUpdateInterval);
     }
 
     void SetTransformPosition(Transform i_childTransform)
@@ -94,21 +87,27 @@ public class GridScript : MonoBehaviour
         GridObject gridObjectScript = i_childTransform.GetComponent<GridObject>();
     }
 
-    Vector2 GridToRenderPosition(Vector2 i_vGridPosition)
+    public Vector2 GridToRenderPosition(Vector2 i_vGridPosition)
     {
-        return i_vGridPosition * tileSize;
+        return new Vector2(transform.position.x, transform.position.y) + i_vGridPosition * tileSize;
     }
 	
 	// Update is called once per frame
-	void Update () 
+	void Update ()
     {
+        if (m_pCongaHeadSurvivor)
+        {
+            mainCamera.transform.position.Set(m_pCongaHeadSurvivor.transform.position.x, m_pCongaHeadSurvivor.transform.position.y, mainCamera.transform.position.z);
+        }
+
         PollInput();
 
-        if (m_fMovementUpdateCountdown > 0)
+        if (m_fMovementUpdateCountdown > 0.0f)
         {
             m_fMovementUpdateCountdown -= Time.deltaTime;
 
-            if (m_fMovementUpdateCountdown <= 0)
+            print("Is it less than? " + m_fMovementUpdateCountdown);
+            if (m_fMovementUpdateCountdown <= 0.0f)
             {
                 OnMovementUpdate();
                 ResetMovementUpdateCountdown();
@@ -128,7 +127,7 @@ public class GridScript : MonoBehaviour
     void OnMovementUpdate()
     {
         // Move the congo head, this will fall through everyone in the congo
-        m_scriptCongoHead.GetMovementComponent().DoMovement();
+        m_scriptCongoHead.DoMovement();
     }
 
     void PollInput()
