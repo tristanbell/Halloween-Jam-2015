@@ -23,7 +23,26 @@ public class SurvivorScript : GridObject
 
     public void SetState(ESurvivorState i_eNewState)
     {
+        // If we're infected
+        if (i_eNewState == ESurvivorState.Infected)
+        {
+            // now infected: change sprite
+
+            // If this is the player
+            if (gameObject.tag == "Player")
+            {
+                print("Game over!");
+            }
+            else
+            {
+                print("Survivor infected");
+            }
+        }
+
+        // Change state
         m_eState = i_eNewState;
+
+        
     }
 
     // Use this for initialization
@@ -78,24 +97,38 @@ public class SurvivorScript : GridObject
 	}
 
 	void OnCollisionEnter2D(Collision2D coll) {
-		if (gameObject.tag == "Player" && coll.gameObject.tag == "Survivor") {
-			GameObject link = survivorBack;
-			
-			if (link == null) {
-				AddSurvivor(coll.gameObject);
-			}
-			else {
-				while (true) {
-					if (link.GetComponent<SurvivorScript>().survivorBack == null) {
-						break;
-					}
+		if (gameObject.tag == "Player") 
+        {
+            if (coll.gameObject.tag == "Survivor")
+            {
+                GameObject link = survivorBack;
 
-					link = link.GetComponent<SurvivorScript>().survivorBack;
-				}
+                if (link == null)
+                {
+                    AddSurvivor(coll.gameObject);
+                }
+                else
+                {
+                    while (true)
+                    {
+                        if (link.GetComponent<SurvivorScript>().survivorBack == null)
+                        {
+                            break;
+                        }
 
-				link.GetComponent<SurvivorScript>().AddSurvivor(coll.gameObject);
-			}
+                        link = link.GetComponent<SurvivorScript>().survivorBack;
+                    }
+
+                    link.GetComponent<SurvivorScript>().AddSurvivor(coll.gameObject);
+                }
+            }
 		}
+
+        // Zombie collision
+        if (coll.gameObject.tag == "Zombie")
+        {
+            SetState(ESurvivorState.Infected);
+        }
 	}
 
 	void AddSurvivor(GameObject survivor) {
