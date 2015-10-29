@@ -30,6 +30,9 @@ public class GridScript : MonoBehaviour
 	// Survivors
 	public Transform survivorInGame;
 
+	// collision map
+	public Texture2D collision_texture;
+
 
     ////////////////////////////////////////////////////////////////////
     // Private values
@@ -59,13 +62,20 @@ public class GridScript : MonoBehaviour
         m_fMovementUpdateInterval = initialMovementTimeInterval;
         ResetMovementUpdateCountdown();
 
+		// create collision texture
+		collision_texture = Resources.Load("male_survivor_sprite_sheet") as Texture2D;
+		print (collision_texture);
+
         // Populate grid with grass sprites
         m_pFloorSprites = new Object[width, height];
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < height; j++)
             {
-                //m_pFloorSprites[i, j] = Instantiate(grassPrefab, GridToRenderPosition(new Vector2(i, j)), Quaternion.identity);
+				if(get_collision(i, j))
+				{
+                	m_pFloorSprites[i, j] = Instantiate(grassPrefab, GridToRenderPosition(new Vector2(i, j)), Quaternion.identity);
+				}
             }
         }
 
@@ -77,6 +87,12 @@ public class GridScript : MonoBehaviour
 
 		SpawnSurvivor ();
     }
+
+	bool get_collision(int x, int y)
+	{
+		Color pixel_color = collision_texture.GetPixel (x, y);
+		return pixel_color.r > 0.5f;
+	}
 
 	void SpawnSurvivor()
 	{
