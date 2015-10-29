@@ -33,7 +33,13 @@ public class MovementComponent : MonoBehaviour {
 
     public void DoMovement()
     {
+        print("Movement!");
         m_bShouldMove = true;
+    }
+
+    public Vector2 GetPosition()
+    {
+        return m_vGridPosition;
     }
 
     public void SetDirection(EDirection i_eNewDirection)
@@ -43,31 +49,37 @@ public class MovementComponent : MonoBehaviour {
 
     private void Move(EDirection m_eMovementDirection)
     {
+        Vector3 translation = new Vector3(0, 0, 0);
+        GridScript gridScript = gameObject.GetComponentInParent<GridScript>();
+
         switch (m_eMovementDirection)
         {
             // TODO Add bounds checking
             case EDirection.UP:
                 {
-                    m_vGridPosition.y--;
+                    translation.y = -gridScript.tileSize;
                 }
                 break;
             case EDirection.DOWN:
                 {
-                    m_vGridPosition.y++;
+                    translation.y = gridScript.tileSize;
                 }
                 break;
             case EDirection.LEFT:
                 {
-                    m_vGridPosition.x--;
+                    translation.x = -gridScript.tileSize;
                 }
                 break;
             case EDirection.RIGHT:
                 {
-                    m_vGridPosition.x++;
+                    translation.x = gridScript.tileSize;
                 }
                 break;
             default:
                 break;
         }
+
+        GridObject go = gameObject.GetComponent<GridObject>();
+        go.transform.Translate(translation);
     }
 }

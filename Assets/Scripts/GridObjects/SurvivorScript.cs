@@ -21,17 +21,13 @@ public class SurvivorScript : GridObject
     {
         m_eState = i_eNewState;
     }
-
-    // Use this for initialization
-	void Start () {
-	
-	}
 	
 	// Update is called once per frame
-	void Update () 
+	public void Update () 
     {
+        base.Update();
+
         // On Movement
-        m_pMovementComponent.DoMovement();
         if (survivorFront)
         {
             //m_vNextPosition = survivorFront.GetGridPosition();
