@@ -47,6 +47,11 @@ public class MovementComponent : MonoBehaviour {
         m_eMovementDirection = i_eNewDirection;
     }
 
+	public EDirection GetDirection()
+	{
+		return m_eMovementDirection;
+	}
+
     private void Move(EDirection m_eMovementDirection)
     {
         Vector3 translation = new Vector3(0, 0, 0);
