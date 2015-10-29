@@ -14,22 +14,21 @@ public class GridScript : MonoBehaviour
     public int height = 40;
     public int tileSize = 32;
 
-    public GameObject grassObject;
+    public Transform grassPrefab;
 
     // The 2D array of grid objects
-    private GameObject[,] m_floorSprites;
+    private Object[,] m_floorSprites;
 
     // Use this for initialization
     void Start()
     {
         // Populate grid with grass sprites
-        m_floorSprites = new GameObject[width, height];
+        m_floorSprites = new Object[width, height];
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < height; j++)
             {
-                m_floorSprites[i,j] = grassObject;
-                m_floorSprites[i, j].transform.position = GridToRenderPosition(new Vector2(i, j));
+                m_floorSprites[i,j] = Instantiate(grassPrefab, GridToRenderPosition(new Vector2(i, j)), Quaternion.identity);
             }
         }
     }
