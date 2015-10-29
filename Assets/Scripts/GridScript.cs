@@ -28,9 +28,6 @@ public class GridScript : MonoBehaviour
     public Transform survivorPrefab;
     public Transform zombiePrefab;
 
-	// Survivors
-	public Transform survivorInGame;
-
 
     ////////////////////////////////////////////////////////////////////
     // Private values
@@ -77,6 +74,7 @@ public class GridScript : MonoBehaviour
 		Vector2 vPlayerSpawnPosition = new Vector2 (0, 0);// spawnPlayerInCentre ? new Vector2(width / 2, height / 2) : playerStartPositionOverride;
         m_pCongaHeadSurvivor = (Transform) Instantiate(survivorPrefab, GridToRenderPosition(vPlayerSpawnPosition), Quaternion.identity);
 		m_pCongaHeadSurvivor.GetComponent<SurvivorScript> ().gridObject = gameObject;
+		m_pCongaHeadSurvivor.GetComponent<MovementComponent> ().SetPosition (vPlayerSpawnPosition);
 		m_pCongaHeadSurvivor.tag = "Player";
         m_scriptCongoHead = m_pCongaHeadSurvivor.GetComponent<SurvivorScript>();
 
@@ -88,11 +86,27 @@ public class GridScript : MonoBehaviour
 		int pos_x = Random.Range(0, width);
 		int pos_y = Random.Range(0, height);
 		Vector2 survivorSpawnPosition = new Vector2 (pos_x, pos_y);
-		survivorInGame = (Transform) Instantiate(survivorPrefab, GridToRenderPosition(survivorSpawnPosition), Quaternion.identity);
-		survivorInGame.GetComponent<SurvivorScript> ().gridObject = gameObject;
+		Transform survivor = (Transform) Instantiate(survivorPrefab, GridToRenderPosition(survivorSpawnPosition), Quaternion.identity);
+		survivor.GetComponent<MovementComponent> ().SetPosition (survivorSpawnPosition);
+		survivor.GetComponent<SurvivorScript> ().gridObject = gameObject;
 	}
-
-    void ResetMovementUpdateCountdown()
+	
+	void SpawnZombie(Vector2 gridPos)
+	{
+		Transform newZombie = (Transform)Instantiate(zombiePrefab, GridToRenderPosition(gridPos), Quaternion.identity);
+		
+		newZombie.GetComponent<MovementComponent> ().SetPosition (gridPos);
+		newZombie.GetComponent<ZombieScript> ().gridObject = gameObject;
+		m_zombieList.Add(newZombie);
+	}
+	
+	void SpawnZombieRandom()
+	{
+		Vector2 gridPos = new Vector2(Random.Range(0, width), Random.Range(0, height));
+		SpawnZombie(gridPos);
+	}
+	
+	void ResetMovementUpdateCountdown()
     {
         // Reset to currnet time interval
         m_fMovementUpdateCountdown = m_fMovementUpdateInterval;
@@ -178,18 +192,5 @@ public class GridScript : MonoBehaviour
             // Spawn Zombie
             SpawnZombieRandom();
         }
-    }
-
-    void SpawnZombie(Vector2 gridPos)
-    {
-        Transform newZombie = (Transform)Instantiate(zombiePrefab, GridToRenderPosition(gridPos), Quaternion.identity);
-        newZombie.parent = gameObject.transform;
-        m_zombieList.Add(newZombie);
-    }
-
-    void SpawnZombieRandom()
-    {
-        Vector2 gridPos = new Vector2(Random.Range(0, width), Random.Range(0, height));
-        SpawnZombie(gridPos);
     }
 }

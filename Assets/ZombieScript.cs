@@ -2,8 +2,8 @@
 using System.Collections;
 
 public class ZombieScript : GridObject {
-
-    public Transform gridObject;
+	
+	public GameObject gridObject;
 
     // The state of the survivor
     ESurvivorState m_eState = ESurvivorState.Stranded;
@@ -48,6 +48,8 @@ public class ZombieScript : GridObject {
             m_pMovementComponent = gameObject.AddComponent<MovementComponent>();
         }
 
+		m_pMovementComponent.SetDirection (RandomDirection ());
+
         animator = GetComponent<Animator>();
     }
 
@@ -56,11 +58,15 @@ public class ZombieScript : GridObject {
     {
         //base.Update();
 
-        // Convert our grid position to the real in-game position
-        GridScript parentGridScript = gridObject.GetComponent<GridScript>();
-
-        Vector2 newPos = parentGridScript.GridToRenderPosition(m_pMovementComponent.GetPosition());
-        transform.localPosition.Set(newPos.x, newPos.y, 0);
+		// Convert our grid position to the real in-game position
+		GridScript parentGridScript = gridObject.GetComponent<GridScript>();
+		
+		Vector2 gridPos = m_pMovementComponent.GetPosition ();
+		//		if (gameObject.tag == "Player")
+		//			print (parentGridScript.GridToRenderPosition(gridPos));
+		
+		Vector2 newPos = parentGridScript.GridToRenderPosition(gridPos);
+		transform.localPosition = new Vector3(newPos.x, newPos.y, 0);
 
         // Set the animation
         //switch (m_pMovementComponent.GetDirection())
