@@ -10,6 +10,8 @@ public enum ESurvivorState
 
 public class SurvivorScript : GridObject 
 {
+    public Transform gridObject;
+
     // The state of the survivor
     ESurvivorState m_eState = ESurvivorState.Stranded;
 
@@ -25,15 +27,25 @@ public class SurvivorScript : GridObject
     }
 
     // Use this for initialization
-	void Start () {
+	void Start () 
+    {
+        base.Start();
+
 		animator = GetComponent<Animator> ();
 	}
 	
 	// Update is called once per frame
 	public void Update () 
     {
-        base.Update();
+        //base.Update();
 
+        // Convert our grid position to the real in-game position
+        GridScript parentGridScript = gridObject.GetComponent<GridScript>();
+
+        Vector2 newPos = parentGridScript.GridToRenderPosition(m_pMovementComponent.GetPosition());
+        transform.localPosition.Set(newPos.x, newPos.y, 0);
+
+        // Set the animation
 		switch (m_pMovementComponent.GetDirection ()) {
 		case EDirection.DOWN:
 			animator.SetInteger("Direction", 0);

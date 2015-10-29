@@ -106,7 +106,6 @@ public class GridScript : MonoBehaviour
         {
             m_fMovementUpdateCountdown -= Time.deltaTime;
 
-            print("Is it less than? " + m_fMovementUpdateCountdown);
             if (m_fMovementUpdateCountdown <= 0.0f)
             {
                 OnMovementUpdate();

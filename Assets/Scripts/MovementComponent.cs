@@ -62,12 +62,12 @@ public class MovementComponent : MonoBehaviour {
             // TODO Add bounds checking
             case EDirection.UP:
                 {
-                    translation.y = -gridScript.tileSize;
+                    translation.y = gridScript.tileSize;
                 }
                 break;
             case EDirection.DOWN:
                 {
-                    translation.y = gridScript.tileSize;
+                    translation.y = -gridScript.tileSize;
                 }
                 break;
             case EDirection.LEFT:
