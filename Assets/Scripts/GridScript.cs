@@ -70,15 +70,19 @@ public class GridScript : MonoBehaviour
         // Add the player to the center
 		Vector2 vPlayerSpawnPosition = new Vector2 (0, 0);// spawnPlayerInCentre ? new Vector2(width / 2, height / 2) : playerStartPositionOverride;
         m_pCongaHeadSurvivor = (Transform) Instantiate(survivorPrefab, GridToRenderPosition(vPlayerSpawnPosition), Quaternion.identity);
-        m_pCongaHeadSurvivor.parent = gameObject.transform;
+		m_pCongaHeadSurvivor.GetComponent<SurvivorScript> ().gridObject = gameObject;
+		m_pCongaHeadSurvivor.tag = "Player";
         m_scriptCongoHead = m_pCongaHeadSurvivor.GetComponent<SurvivorScript>();
-    }
 
-    void ResetMovementUpdateCountdown()
+		Transform thing = (Transform) Instantiate(survivorPrefab, GridToRenderPosition(new Vector2(0, -3)), Quaternion.identity);
+		thing.GetComponent<SurvivorScript> ().gridObject = gameObject;
+	}
+	
+	void ResetMovementUpdateCountdown()
     {
         // Reset to currnet time interval
         m_fMovementUpdateCountdown = m_fMovementUpdateInterval;
-        print(m_fMovementUpdateInterval);
+        //print(m_fMovementUpdateInterval);
     }
 
     void SetTransformPosition(Transform i_childTransform)
@@ -88,7 +92,9 @@ public class GridScript : MonoBehaviour
 
     public Vector2 GridToRenderPosition(Vector2 i_vGridPosition)
     {
-        return new Vector2(transform.position.x, transform.position.y) + i_vGridPosition * tileSize;
+        Vector2 result = new Vector2(transform.position.x, transform.position.y) + i_vGridPosition * tileSize;
+		print (result);
+		return result;
     }
 	
 	// Update is called once per frame

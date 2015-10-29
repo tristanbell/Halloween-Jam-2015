@@ -10,7 +10,7 @@ public enum ESurvivorState
 
 public class SurvivorScript : GridObject 
 {
-    public Transform gridObject;
+    public GameObject gridObject;
 
     // The state of the survivor
     ESurvivorState m_eState = ESurvivorState.Stranded;
@@ -42,8 +42,12 @@ public class SurvivorScript : GridObject
         // Convert our grid position to the real in-game position
         GridScript parentGridScript = gridObject.GetComponent<GridScript>();
 
-        Vector2 newPos = parentGridScript.GridToRenderPosition(m_pMovementComponent.GetPosition());
-        transform.localPosition.Set(newPos.x, newPos.y, 0);
+		Vector2 gridPos = m_pMovementComponent.GetPosition ();
+//		if (gameObject.tag == "Player")
+//			print (parentGridScript.GridToRenderPosition(gridPos));
+
+        Vector2 newPos = parentGridScript.GridToRenderPosition(gridPos);
+        transform.localPosition = new Vector3(newPos.x, newPos.y, 0);
 
         // Set the animation
 		switch (m_pMovementComponent.GetDirection ()) {
@@ -72,4 +76,62 @@ public class SurvivorScript : GridObject
         }
         
 	}
+
+	void OnCollisionEnter2D(Collision2D coll) {
+		if (gameObject.tag == "Player" && coll.gameObject.tag == "Survivor") {
+			GameObject link = survivorBack;
+			
+			if (link == null) {
+				AddSurvivor(coll.gameObject);
+			}
+			else {
+				while (true) {
+					if (link.GetComponent<SurvivorScript>().survivorBack == null) {
+						break;
+					}
+
+					link = link.GetComponent<SurvivorScript>().survivorBack;
+				}
+
+				link.GetComponent<SurvivorScript>().AddSurvivor(coll.gameObject);
+			}
+		}
+	}
+
+	void AddSurvivor(GameObject survivor) {
+		survivorBack = survivor;
+
+		Vector2 backPos = m_pMovementComponent.GetPosition ();
+
+		switch (m_pMovementComponent.GetDirection ()) {
+		case EDirection.DOWN:
+			backPos.y++;
+			break;
+		case EDirection.LEFT:
+			backPos.x++;
+			break;
+		case EDirection.UP:
+			backPos.y--;
+			break;
+		case EDirection.RIGHT:
+			backPos.x--;
+			break;
+		}
+
+		survivorBack.GetComponent<SurvivorScript>().m_pMovementComponent.SetPosition (new Vector2(0, 0));
+		survivorBack.GetComponent<SurvivorScript>().m_pMovementComponent.SetDirection (m_pMovementComponent.GetDirection ());
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
