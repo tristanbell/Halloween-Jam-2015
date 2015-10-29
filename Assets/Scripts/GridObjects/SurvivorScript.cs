@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-enum ESurvivorState
+public enum ESurvivorState
 {
     Stranded,
     Conga,
