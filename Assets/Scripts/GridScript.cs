@@ -93,6 +93,9 @@ public class GridScript : MonoBehaviour
 
 	bool get_collision(int x, int y)
 	{
+		if (x < 0 || y < 0 || x >= collision_texture.width || y >= collision_texture.height) {
+			return true;
+		}
 		Color pixel_color = collision_texture.GetPixel (x, y);
 		return pixel_color.r > 0.5f;
 	}
