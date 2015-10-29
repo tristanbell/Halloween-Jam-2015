@@ -52,7 +52,6 @@ public class GridScript : MonoBehaviour
         // Init camera
         Vector2 cameraPosition = GridToRenderPosition(new Vector2(width / 2, height / 2));
         mainCamera.transform.position.Set(cameraPosition.x, cameraPosition.y, 0);
-        mainCamera.orthographicSize = width / 4;
 
         // Set the movement countdown to the initial value
         m_fMovementUpdateInterval = initialMovementTimeInterval;
