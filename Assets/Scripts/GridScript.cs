@@ -27,6 +27,8 @@ public class GridScript : MonoBehaviour
     public Transform grassPrefab;
     public Transform survivorPrefab;
 
+	// Survivors
+	public Transform survivorInGame;
 
 
     ////////////////////////////////////////////////////////////////////
@@ -72,7 +74,18 @@ public class GridScript : MonoBehaviour
         m_pCongaHeadSurvivor = (Transform) Instantiate(survivorPrefab, GridToRenderPosition(vPlayerSpawnPosition), Quaternion.identity);
         m_pCongaHeadSurvivor.parent = gameObject.transform;
         m_scriptCongoHead = m_pCongaHeadSurvivor.GetComponent<SurvivorScript>();
+
+		SpawnSurvivor ();
     }
+
+	void SpawnSurvivor()
+	{
+		int pos_x = Random.Range(0, width);
+		int pos_y = Random.Range(0, height);
+		Vector2 survivorSpawnPosition = new Vector2 (pos_x, pos_y);
+		survivorInGame = (Transform) Instantiate(survivorPrefab, GridToRenderPosition(survivorSpawnPosition), Quaternion.identity);
+		survivorInGame.parent = gameObject.transform;
+	}
 
     void ResetMovementUpdateCountdown()
     {
