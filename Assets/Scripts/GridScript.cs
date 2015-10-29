@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class GridScript : MonoBehaviour 
+public class GridScript : MonoBehaviour
 {
 
     ////////////////////////////////////////////////////////////////////
@@ -26,6 +26,7 @@ public class GridScript : MonoBehaviour
     // Prefabs!
     public Transform grassPrefab;
     public Transform survivorPrefab;
+    public Transform zombiePrefab;
 
 	// Survivors
 	public Transform survivorInGame;
@@ -40,7 +41,7 @@ public class GridScript : MonoBehaviour
     private Transform m_pCongaHeadSurvivor;
     private SurvivorScript m_scriptCongoHead;
 
-    
+    private List<Transform> m_zombieList = new List<Transform>();
 
     // Countdown to movement update
     private float m_fMovementUpdateInterval;
@@ -54,6 +55,7 @@ public class GridScript : MonoBehaviour
         // Init camera
         Vector2 cameraPosition = GridToRenderPosition(new Vector2(width / 2, height / 2));
         mainCamera.transform.position.Set(cameraPosition.x, cameraPosition.y, 0);
+        //mainCamera.orthographicSize = width / 4;
 
         // Set the movement countdown to the initial value
         m_fMovementUpdateInterval = initialMovementTimeInterval;
@@ -69,9 +71,11 @@ public class GridScript : MonoBehaviour
             }
         }
 
+		SpawnZombieRandom ();
+
         // Add the player to the center
-		Vector2 vPlayerSpawnPosition = new Vector2 (0, 0);// spawnPlayerInCentre ? new Vector2(width / 2, height / 2) : playerStartPositionOverride;
-        m_pCongaHeadSurvivor = (Transform) Instantiate(survivorPrefab, GridToRenderPosition(vPlayerSpawnPosition), Quaternion.identity);
+        Vector2 vPlayerSpawnPosition = new Vector2(0, 0);// spawnPlayerInCentre ? new Vector2(width / 2, height / 2) : playerStartPositionOverride;
+        m_pCongaHeadSurvivor = (Transform)Instantiate(survivorPrefab, GridToRenderPosition(vPlayerSpawnPosition), Quaternion.identity);
         m_pCongaHeadSurvivor.parent = gameObject.transform;
         m_scriptCongoHead = m_pCongaHeadSurvivor.GetComponent<SurvivorScript>();
 
@@ -103,9 +107,9 @@ public class GridScript : MonoBehaviour
     {
         return new Vector2(transform.position.x, transform.position.y) + i_vGridPosition * tileSize;
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    // Update is called once per frame
+    void Update()
     {
         if (m_pCongaHeadSurvivor)
         {
@@ -139,6 +143,11 @@ public class GridScript : MonoBehaviour
     {
         // Move the congo head, this will fall through everyone in the congo
         m_scriptCongoHead.DoMovement();
+
+        for (int i = 0; i < m_zombieList.Count; i++)
+        {
+            m_zombieList.ToArray()[i].GetComponent<ZombieScript>().DoMovement();
+        }
     }
 
     void PollInput()
@@ -162,5 +171,24 @@ public class GridScript : MonoBehaviour
         {
             m_scriptCongoHead.GetMovementComponent().SetDirection(EDirection.RIGHT);
         }
+
+        if (Input.GetKey("z"))
+        {
+            // Spawn Zombie
+            SpawnZombieRandom();
+        }
+    }
+
+    void SpawnZombie(Vector2 gridPos)
+    {
+        Transform newZombie = (Transform)Instantiate(zombiePrefab, GridToRenderPosition(gridPos), Quaternion.identity);
+        newZombie.parent = gameObject.transform;
+        m_zombieList.Add(newZombie);
+    }
+
+    void SpawnZombieRandom()
+    {
+        Vector2 gridPos = new Vector2(Random.Range(0, width), Random.Range(0, height));
+        SpawnZombie(gridPos);
     }
 }

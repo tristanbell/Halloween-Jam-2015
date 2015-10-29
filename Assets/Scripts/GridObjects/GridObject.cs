@@ -13,6 +13,10 @@ public class GridObject : MonoBehaviour
 
     public void DoMovement()
     {
+        if (m_pMovementComponent == null)
+        {
+            m_pMovementComponent = gameObject.AddComponent<MovementComponent>();
+        }
         m_pMovementComponent.DoMovement();
     }
 
