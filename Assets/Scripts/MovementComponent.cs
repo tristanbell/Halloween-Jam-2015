@@ -9,7 +9,6 @@ enum EDirection
 
 public class MovementComponent : MonoBehaviour {
 
-    GridObject m_gridObjectOwner = null;
     bool m_bShouldMove = false;
     EDirection m_eMovementDirection = EDirection.UP;
 
