@@ -56,7 +56,6 @@ public class GridScript : MonoBehaviour
         // Init camera
         Vector2 cameraPosition = GridToRenderPosition(new Vector2(width / 2, height / 2));
         mainCamera.transform.position.Set(cameraPosition.x, cameraPosition.y, 0);
-        //mainCamera.orthographicSize = width / 4;
 
         // Set the movement countdown to the initial value
         m_fMovementUpdateInterval = initialMovementTimeInterval;
@@ -96,7 +95,7 @@ public class GridScript : MonoBehaviour
 		SpawnZombieRandom ();
 
         // Add the player to the center
-		Vector2 vPlayerSpawnPosition = new Vector2 (0, 0);// spawnPlayerInCentre ? new Vector2(width / 2, height / 2) : playerStartPositionOverride;
+		Vector2 vPlayerSpawnPosition = GetRandomSpawnPosition ();
         m_pCongaHeadSurvivor = (Transform) Instantiate(survivorPrefab, GridToRenderPosition(vPlayerSpawnPosition), Quaternion.identity);
 		m_pCongaHeadSurvivor.GetComponent<SurvivorScript> ().gridObject = gameObject;
 		m_pCongaHeadSurvivor.GetComponent<SurvivorScript> ().SetPosition (vPlayerSpawnPosition);
@@ -161,8 +160,9 @@ public class GridScript : MonoBehaviour
 		// Focus camera on the head survivor
 		print (m_pCongaHeadSurvivor);
         if (m_pCongaHeadSurvivor)
-        {
-            mainCamera.transform.position.Set(m_pCongaHeadSurvivor.transform.position.x, m_pCongaHeadSurvivor.transform.position.y, mainCamera.transform.position.z);
+		{
+			Vector3 cameraTranslation = m_pCongaHeadSurvivor.transform.position - mainCamera.transform.position;
+			mainCamera.transform.Translate (cameraTranslation.x, cameraTranslation.y, 0);
         }
 
         PollInput();
