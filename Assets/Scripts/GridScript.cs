@@ -87,7 +87,7 @@ public class GridScript : MonoBehaviour
 				if(get_collision(i, j))
 				{
 					// TODO: Add a collision box here which will register as a wall
-					m_pFloorSprites[i, j] = (Transform) Instantiate(grassPrefab, GridToRenderPosition(GetRandomSpawnPosition()), Quaternion.identity);
+					//m_pFloorSprites[i, j] = (Transform) Instantiate(grassPrefab, GridToRenderPosition(GetRandomSpawnPosition()), Quaternion.identity);
 				}
             }
         }
@@ -157,15 +157,7 @@ public class GridScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-		// Focus camera on the head survivor
-		print (m_pCongaHeadSurvivor);
-        if (m_pCongaHeadSurvivor)
-		{
-			Vector3 cameraTranslation = m_pCongaHeadSurvivor.transform.position - mainCamera.transform.position;
-			mainCamera.transform.Translate (cameraTranslation.x, cameraTranslation.y, 0);
-        }
-
-        PollInput();
+		PollInput();
 
         if (m_fMovementUpdateCountdown > 0.0f)
         {
@@ -176,15 +168,14 @@ public class GridScript : MonoBehaviour
                 OnMovementUpdate();
                 ResetMovementUpdateCountdown();
             }
-        }
-
-        // Loop through all grid objects
-        //int children = transform.childCount;
-        //for (int i = 0; i < children; ++i)
-        //{
-        //    // Set their render position based on their grid position.
-        //    Transform childTransform = transform.GetChild(i);
-        //}
+		}
+		
+		// Focus camera on the head survivor
+		if (m_pCongaHeadSurvivor)
+		{
+			Vector3 cameraTranslation = m_pCongaHeadSurvivor.transform.position - mainCamera.transform.position;
+			mainCamera.transform.Translate (cameraTranslation.x, cameraTranslation.y, 0);
+		}
     }
 
     void OnMovementUpdate()

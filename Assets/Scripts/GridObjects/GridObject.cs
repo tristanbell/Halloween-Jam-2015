@@ -15,19 +15,19 @@ public class GridObject : MonoBehaviour
 	private bool m_bShouldMove = false;
 	private EDirection m_eMovementDirection = EDirection.NONE;
 	private Vector2 m_vGridPosition = new Vector2 (0, 0);
-
+	
 	public GameObject gridObject;
-
+	
 	protected Animator animator;
-
+	
 	protected void Start()
 	{
 		animator = GetComponent<Animator> ();
 	}
-
+	
 	public void DoMovement ()
 	{
-		m_bShouldMove = true;
+		Move ();
 	}
 	
 	public Vector2 GetPosition ()
@@ -38,6 +38,11 @@ public class GridObject : MonoBehaviour
 	public void SetPosition (Vector2 pos)
 	{
 		m_vGridPosition = pos;
+	}
+	
+	public void SetDirection (EDirection i_eNewDirection)
+	{
+		m_eMovementDirection = i_eNewDirection;
 		
 		if (animator) 
 		{
@@ -59,11 +64,6 @@ public class GridObject : MonoBehaviour
 		}
 	}
 	
-	public void SetDirection (EDirection i_eNewDirection)
-	{
-		m_eMovementDirection = i_eNewDirection;
-	}
-	
 	public EDirection GetDirection ()
 	{
 		return m_eMovementDirection;
@@ -71,81 +71,57 @@ public class GridObject : MonoBehaviour
 	
 	private void Move ()
 	{
-		Vector2 suggestedPosition = new Vector2 (0, 0);
+		Vector2 suggestedPosition = m_vGridPosition;
 		GridScript gridScript = gridObject.GetComponent<GridScript>();
 		
-		switch (m_eMovementDirection) {
-		case EDirection.UP:
+		switch (m_eMovementDirection) 
 		{
-			suggestedPosition.y += gridScript.tileSize;
-			//m_vGridPosition.y++;
+			case EDirection.UP:
+			{
+				//suggestedPosition.y += gridScript.tileSize;
+				suggestedPosition.y++;
+			}
+				break;
+			case EDirection.DOWN:
+			{
+				//suggestedPosition.y -= gridScript.tileSize;
+				suggestedPosition.y--;
+			}
+				break;
+			case EDirection.LEFT:
+			{
+				//suggestedPosition.x -= gridScript.tileSize;
+				suggestedPosition.x--;
+			}
+				break;
+			case EDirection.RIGHT:
+			{
+				//suggestedPosition.x += gridScript.tileSize;
+				suggestedPosition.x++;
+			}
+				break;
+			default:
+				break;
 		}
-			break;
-		case EDirection.DOWN:
+		
+		if (gridScript.get_collision ((int)suggestedPosition.x, (int)suggestedPosition.y))
 		{
-			suggestedPosition.y -= gridScript.tileSize;
-			//m_vGridPosition.y--;
-		}
-			break;
-		case EDirection.LEFT:
-		{
-			suggestedPosition.x -= gridScript.tileSize;
-			//m_vGridPosition.x--;
-		}
-			break;
-		case EDirection.RIGHT:
-		{
-			suggestedPosition.x += gridScript.tileSize;
-			//m_vGridPosition.x++;
-		}
-			break;
-		default:
-			break;
-		}
-
-		if (gridScript.get_collision ((int)suggestedPosition.x, (int)suggestedPosition.y)) 
-		{
-			// We have hit a wall; do nothing.
+			// We have hit a wall; do nothing. TODO: Die upon hitting a wall
 			print ("Wall!");
 		} 
 		else 
 		{
 			// Update position
-			m_vGridPosition += suggestedPosition;
+			m_vGridPosition = suggestedPosition;
 		}
-
+		
 		// Set the in-game position of this object
-		Vector2 gridPos = GetPosition ();
-		//		if (gameObject.tag == "Player")
-		//			print (parentGridScript.GridToRenderPosition(gridPos));
-		
-		Vector2 newPos = gridScript.GridToRenderPosition(gridPos);
-		transform.localPosition = new Vector3(newPos.x, newPos.y, 0);
+		Vector2 newPos = m_vGridPosition;
+		transform.localPosition = newPos * gridScript.tileSize;
 	}
-
-    protected void Update()
-    {
-		if (m_bShouldMove) {
-			Move ();
-			
-			// Stop moving
-			m_bShouldMove = false;
-		}
 		
-		// Convert our grid position to the real in-game position
-		GridScript parentGridScript = gridObject.GetComponent<GridScript>();
-		
-		Vector2 gridPos = GetPosition ();
-		//		if (gameObject.tag == "Player")
-		//			print (parentGridScript.GridToRenderPosition(gridPos));
-		
-		Vector2 newPos = parentGridScript.GridToRenderPosition(gridPos);
-		transform.localPosition = new Vector3(newPos.x, newPos.y, 0);
+	protected void Update()
+	{
 
-        //// Convert our grid position to the real in-game position
-        //GridScript parentGridScript = gameObject.GetComponentInParent<GridScript>();
-
-        //Vector2 newPos = parentGridScript.GridToRenderPosition(m_pMovementComponent.GetPosition());
-        //transform.localPosition.Set(newPos.x, newPos.y, 0);
-    }
+	}
 }

@@ -41,7 +41,7 @@ public class SurvivorScript : GridObject
     }
 	
 	// Update is called once per frame
-	public void Update () 
+	protected void Update () 
     {
         base.Update();
 
