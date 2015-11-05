@@ -1,9 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public enum EDirection
+{
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT,
+	NONE
+}
+
 public class GridObject : MonoBehaviour
 {
-<<<<<<< HEAD
 	private bool m_bShouldMove = false;
 	private EDirection m_eMovementDirection = EDirection.NONE;
 	private Vector2 m_vGridPosition = new Vector2 (0, 0);
@@ -116,36 +124,4 @@ public class GridObject : MonoBehaviour
 	{
 
 	}
-=======
-    protected MovementComponent m_pMovementComponent;
-
-	// Use this for initialization
-	protected void Start()
-    {
-        m_pMovementComponent = GetComponent<MovementComponent>();
-	}
-
-    public void DoMovement()
-    {
-        if (m_pMovementComponent == null)
-        {
-            m_pMovementComponent = gameObject.AddComponent<MovementComponent>();
-        }
-        m_pMovementComponent.DoMovement();
-    }
-
-    protected void Update()
-    {
-        //// Convert our grid position to the real in-game position
-        //GridScript parentGridScript = gameObject.GetComponentInParent<GridScript>();
-
-        //Vector2 newPos = parentGridScript.GridToRenderPosition(m_pMovementComponent.GetPosition());
-        //transform.localPosition.Set(newPos.x, newPos.y, 0);
-    }
-
-    public MovementComponent GetMovementComponent()
-    {
-        return m_pMovementComponent;
-    }
->>>>>>> cdec89b6e60b3124ad664475807ad300f8b72a37
 }
