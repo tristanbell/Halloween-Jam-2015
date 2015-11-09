@@ -69,7 +69,7 @@ public class GridObject : MonoBehaviour
 		return m_eMovementDirection;
 	}
 	
-	private void Move ()
+	protected void Move ()
 	{
 		Vector2 suggestedPosition = m_vGridPosition;
 		GridScript gridScript = gridObject.GetComponent<GridScript>();
@@ -119,8 +119,57 @@ public class GridObject : MonoBehaviour
 		Vector2 newPos = m_vGridPosition;
 		transform.localPosition = newPos * gridScript.tileSize;
 	}
+	
+	// Returns direction from LHS to RHS
+	static public EDirection DirectionFromTo(GameObject lhs, GameObject rhs)
+	{
+		Vector3 lhsPos = lhs.transform.position;
+		Vector3 rhsPos = rhs.transform.position;
 		
-	protected void Update()
+		if (lhsPos.x == rhsPos.x) 
+		{
+			if (lhsPos.y > rhsPos.y)
+			{
+				// LHS is above RHS; must go down
+				return EDirection.DOWN;
+			}
+			else if (lhsPos.y < rhsPos.y)
+			{
+				// LHS is below RHS; must go up
+				return EDirection.UP;
+			}
+			else
+			{
+				print ("Movement direction broken! Survivors are in the same position.");
+			}
+		} 
+		else if (lhsPos.y == rhsPos.y) 
+		{
+			if (lhsPos.x > rhsPos.x)
+			{
+				// LHS is right of RHS; must go left
+				return EDirection.LEFT;
+			}
+			else if (lhsPos.x < rhsPos.x)
+			{
+				// LHS is left of RHS; must go right
+				return EDirection.RIGHT;
+			}
+			else
+			{
+				print ("Movement direction broken! Survivors are in the same position.");
+			}
+		} 
+		else 
+		{
+			print ("Movement direction broken! Survivors not adjacent.");
+		}
+		
+		// Error case:
+		return EDirection.NONE;
+	}
+
+	public void Update()
 	{
 
 	}

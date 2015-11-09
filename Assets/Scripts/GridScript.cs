@@ -12,9 +12,9 @@ public class GridScript : MonoBehaviour
     public Camera mainCamera;
 
     // Public config
-    public int width = 40;
-    public int height = 40;
-    public float tileSize = 0.1f;
+    public int width = 150;
+    public int height = 150;
+    public float tileSize = 0.3f;
 
     // Timing
     public float initialMovementTimeInterval = 1.0f;
@@ -24,9 +24,9 @@ public class GridScript : MonoBehaviour
     public Vector2 playerStartPositionOverride; // If the player isn't set to spawn in the centre, spawn in this position instead.
 
     // Prefabs!
-    public Transform grassPrefab;
-    public Transform survivorPrefab;
-    public Transform zombiePrefab;
+    public GameObject grassPrefab;
+	public GameObject survivorPrefab;
+	public GameObject zombiePrefab;
 
 
     ////////////////////////////////////////////////////////////////////
@@ -38,17 +38,15 @@ public class GridScript : MonoBehaviour
 	private List<Vector2> validSpawnPoints = new List<Vector2>();
 
     // The 2D array of grid objects
-    private Transform[,] m_pFloorSprites;
-    private Transform m_pCongaHeadSurvivor;
+    private GameObject[,] m_pFloorSprites;
+	private GameObject m_pCongaHeadSurvivor;
     private SurvivorScript m_scriptCongoHead;
 
-    private List<Transform> m_zombieList = new List<Transform>();
+	private List<GameObject> m_zombieList = new List<GameObject>();
 
     // Countdown to movement update
     private float m_fMovementUpdateInterval;
     private float m_fMovementUpdateCountdown;
-
-    // TODO Add an "Add" function, which will take a grid position and add instantiate a prefab at that position
 
     // Use this for initialization
     void Start()
@@ -79,7 +77,7 @@ public class GridScript : MonoBehaviour
 		}
 
         // Populate grid with grass sprites
-        m_pFloorSprites = new Transform[width, height];
+        m_pFloorSprites = new GameObject[width, height];
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < height; j++)
@@ -87,22 +85,26 @@ public class GridScript : MonoBehaviour
 				if(get_collision(i, j))
 				{
 					// TODO: Add a collision box here which will register as a wall
-					//m_pFloorSprites[i, j] = (Transform) Instantiate(grassPrefab, GridToRenderPosition(GetRandomSpawnPosition()), Quaternion.identity);
+					m_pFloorSprites[i, j] = (GameObject) Instantiate(grassPrefab, GridToRenderPosition(GetRandomSpawnPosition()), Quaternion.identity);
 				}
             }
-        }
+		}
+		
+		SpawnPlayer ();
 
 		SpawnZombieRandom ();
+		SpawnSurvivorRandom ();
+	}
 
-        // Add the player to the center
+	private void SpawnPlayer()
+	{
+		// Add the player to the center
 		Vector2 vPlayerSpawnPosition = GetRandomSpawnPosition ();
-        m_pCongaHeadSurvivor = (Transform) Instantiate(survivorPrefab, GridToRenderPosition(vPlayerSpawnPosition), Quaternion.identity);
+		m_pCongaHeadSurvivor = (GameObject) Instantiate(survivorPrefab, GridToRenderPosition(vPlayerSpawnPosition), Quaternion.identity);
 		m_pCongaHeadSurvivor.GetComponent<SurvivorScript> ().gridObject = gameObject;
 		m_pCongaHeadSurvivor.GetComponent<SurvivorScript> ().SetPosition (vPlayerSpawnPosition);
 		m_pCongaHeadSurvivor.tag = "Player";
-        m_scriptCongoHead = m_pCongaHeadSurvivor.GetComponent<SurvivorScript>();
-
-		SpawnSurvivor ();
+		m_scriptCongoHead = m_pCongaHeadSurvivor.GetComponent<SurvivorScript>();
 	}
 	
 	public bool get_collision(int x, int y)
@@ -118,18 +120,26 @@ public class GridScript : MonoBehaviour
 	{
 		return validSpawnPoints[Random.Range (0, validSpawnPoints.Count)];
 	}
-
-	void SpawnSurvivor()
+	
+	public GameObject SpawnSurvivorRandom()
 	{
-		Vector2 survivorSpawnPosition = GetRandomSpawnPosition ();
-		Transform survivor = (Transform) Instantiate(survivorPrefab, GridToRenderPosition(survivorSpawnPosition), Quaternion.identity);
-		survivor.GetComponent<SurvivorScript> ().SetPosition (survivorSpawnPosition);
+		Vector2 gridPos = GetRandomSpawnPosition();
+		return SpawnSurvivor(gridPos);
+	}
+
+	public GameObject SpawnSurvivor(Vector2 gridPos)
+	{
+		GameObject survivor = (GameObject) Instantiate(survivorPrefab, GridToRenderPosition(gridPos), Quaternion.identity);
+		survivor.GetComponent<SurvivorScript> ().SetPosition (gridPos);
 		survivor.GetComponent<SurvivorScript> ().gridObject = gameObject;
+		survivor.tag = "Survivor";
+
+		return survivor;
 	}
 	
 	void SpawnZombie(Vector2 gridPos)
 	{
-		Transform newZombie = (Transform)Instantiate(zombiePrefab, GridToRenderPosition(gridPos), Quaternion.identity);
+		GameObject newZombie = (GameObject) Instantiate(zombiePrefab, GridToRenderPosition(gridPos), Quaternion.identity);
 		
 		newZombie.GetComponent<ZombieScript> ().SetPosition (gridPos);
 		newZombie.GetComponent<ZombieScript> ().gridObject = gameObject;
@@ -209,12 +219,24 @@ public class GridScript : MonoBehaviour
         if (Input.GetKey("d"))
         {
             m_scriptCongoHead.SetDirection(EDirection.RIGHT);
-        }
+		}
 
-        if (Input.GetKey("z"))
-        {
-            // Spawn Zombie
-            SpawnZombieRandom();
-        }
+		// Debug controls
+		if (Input.GetKey("z"))
+		{
+			// Spawn Zombie
+			SpawnZombieRandom();
+		}
+		
+		if (Input.GetKey("x"))
+		{
+			// Add a survivor to the conga
+			m_scriptCongoHead.AddSurvivor();
+		}
+		
+		if (Input.GetKey("c"))
+		{
+			// Infect a random survivor in the conga line
+		}
     }
 }

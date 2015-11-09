@@ -36,9 +36,25 @@ public class SurvivorScript : GridObject
 
         // Change state
         m_eState = i_eNewState;
+	}
 
-        
-    }
+	public void DoMovement()
+	{
+		Move ();
+	}
+
+	protected void Move()
+	{
+		// Move our back survivor in our direction
+		if (survivorBack) 
+		{
+			survivorBack.GetComponent<SurvivorScript>().SetDirection(DirectionFromTo(survivorBack, this.gameObject));
+			survivorBack.GetComponent<SurvivorScript>().Move(); // This will recurse throughout all members of the conga
+		}
+
+		// Move us
+		base.Move ();
+	}
 	
 	// Update is called once per frame
 	protected void Update () 
@@ -53,29 +69,48 @@ public class SurvivorScript : GridObject
         
 	}
 
+	public void AddSurvivor()
+	{
+		GameObject link = survivorBack;
+		
+		if (link)
+		{
+			// Recurse back
+			survivorBack.GetComponent<SurvivorScript>().AddSurvivor();
+		}
+		else // We are the back position
+		{
+			// Get the position behind us
+			Vector2 backPos = GetPosition ();
+			
+			switch (GetDirection ()) {
+			case EDirection.DOWN:
+				backPos.y++;
+				break;
+			case EDirection.LEFT:
+				backPos.x++;
+				break;
+			case EDirection.UP:
+				backPos.y--;
+				break;
+			case EDirection.RIGHT:
+				backPos.x--;
+				break;
+			}
+			
+			survivorBack = gridObject.GetComponent<GridScript>().SpawnSurvivor(backPos).gameObject;
+			survivorBack.GetComponent<SurvivorScript>().SetDirection (GetDirection ());
+		}
+	}
+
 	void OnCollisionEnter2D(Collision2D coll) {
 		if (gameObject.tag == "Player") 
         {
 			if (coll.gameObject.tag == "Survivor") // Player hits survivor
             {
-                GameObject link = survivorBack;
+				AddSurvivor();
 
-                if (link == null)
-                {
-					// We have no survivor behind us; add the collision object to the line
-                    AddSurvivor(coll.gameObject);
-                }
-                else
-                {
-					// Search for the final link in the line
-					while (link.GetComponent<SurvivorScript>().survivorBack != null)
-                    {
-                        link = link.GetComponent<SurvivorScript>().survivorBack;
-                    }
-
-					// Add the collision object to the back of the final survivor
-                    link.GetComponent<SurvivorScript>().AddSurvivor(coll.gameObject);
-                }
+				// Now remove survivor (coll.gameObject.tag) from the world
             }
         }
 
@@ -84,30 +119,6 @@ public class SurvivorScript : GridObject
         {
             SetState(ESurvivorState.Infected);
         }
-	}
-
-	void AddSurvivor(GameObject survivor) {
-		survivorBack = survivor;
-
-		Vector2 backPos = GetPosition ();
-
-		switch (GetDirection ()) {
-		case EDirection.DOWN:
-			backPos.y++;
-			break;
-		case EDirection.LEFT:
-			backPos.x++;
-			break;
-		case EDirection.UP:
-			backPos.y--;
-			break;
-		case EDirection.RIGHT:
-			backPos.x--;
-			break;
-		}
-
-		survivorBack.GetComponent<SurvivorScript>().SetPosition (backPos);
-		survivorBack.GetComponent<SurvivorScript>().SetDirection (GetDirection ());
 	}
 }
 
