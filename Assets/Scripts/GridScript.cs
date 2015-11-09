@@ -14,18 +14,21 @@ public class GridScript : MonoBehaviour
     // Public config
     public int width = 150;
     public int height = 150;
-    public float tileSize = 0.3f;
+    public float tileSize = 0.32f;
 
     // Timing
     public float initialMovementTimeInterval = 1.0f;
+	public float minimumMovementTimeInterval = 0.1f;
 
     // Player spawning
     public bool spawnPlayerInCentre = true;
     public Vector2 playerStartPositionOverride; // If the player isn't set to spawn in the centre, spawn in this position instead.
 
     // Prefabs!
-    public GameObject grassPrefab;
-	public GameObject survivorPrefab;
+	public GameObject grassPrefab;
+	public GameObject heroPrefab;
+	public GameObject survivorMalePrefab;
+	public GameObject survivorFemalePrefab;
 	public GameObject zombiePrefab;
 
 
@@ -55,13 +58,8 @@ public class GridScript : MonoBehaviour
         Vector2 cameraPosition = GridToRenderPosition(new Vector2(width / 2, height / 2));
         mainCamera.transform.position.Set(cameraPosition.x, cameraPosition.y, 0);
 
-        // Set the movement countdown to the initial value
-        m_fMovementUpdateInterval = initialMovementTimeInterval;
-        ResetMovementUpdateCountdown();
-
 		// create collision texture
 		collision_texture = Resources.Load("collision") as Texture2D;
-		print (collision_texture);
 
 		// Build a list of valid positions (for spawning)
 		for (int i = 0; i < collision_texture.width; i++) 
@@ -85,22 +83,26 @@ public class GridScript : MonoBehaviour
 				if(get_collision(i, j))
 				{
 					// TODO: Add a collision box here which will register as a wall
-					m_pFloorSprites[i, j] = (GameObject) Instantiate(grassPrefab, GridToRenderPosition(GetRandomSpawnPosition()), Quaternion.identity);
+					//m_pFloorSprites[i, j] = (GameObject) Instantiate(grassPrefab, GridToRenderPosition(GetRandomSpawnPosition()), Quaternion.identity);
 				}
             }
 		}
 		
 		SpawnPlayer ();
 
-		SpawnZombieRandom ();
-		SpawnSurvivorRandom ();
+//		SpawnZombieRandom ();
+//		SpawnSurvivorRandom ();
+		
+		// Set the movement countdown to the initial value
+		m_fMovementUpdateInterval = initialMovementTimeInterval;
+		ResetMovementUpdateCountdown();
 	}
 
 	private void SpawnPlayer()
 	{
 		// Add the player to the center
 		Vector2 vPlayerSpawnPosition = GetRandomSpawnPosition ();
-		m_pCongaHeadSurvivor = (GameObject) Instantiate(survivorPrefab, GridToRenderPosition(vPlayerSpawnPosition), Quaternion.identity);
+		m_pCongaHeadSurvivor = (GameObject) Instantiate(heroPrefab, GridToRenderPosition(vPlayerSpawnPosition), Quaternion.identity);
 		m_pCongaHeadSurvivor.GetComponent<SurvivorScript> ().gridObject = gameObject;
 		m_pCongaHeadSurvivor.GetComponent<SurvivorScript> ().SetPosition (vPlayerSpawnPosition);
 		m_pCongaHeadSurvivor.tag = "Player";
@@ -129,7 +131,7 @@ public class GridScript : MonoBehaviour
 
 	public GameObject SpawnSurvivor(Vector2 gridPos)
 	{
-		GameObject survivor = (GameObject) Instantiate(survivorPrefab, GridToRenderPosition(gridPos), Quaternion.identity);
+		GameObject survivor = (GameObject) Instantiate(Random.Range(0, 2) == 0 ? survivorMalePrefab : survivorFemalePrefab, GridToRenderPosition(gridPos), Quaternion.identity);
 		survivor.GetComponent<SurvivorScript> ().SetPosition (gridPos);
 		survivor.GetComponent<SurvivorScript> ().gridObject = gameObject;
 		survivor.tag = "Survivor";
@@ -154,8 +156,14 @@ public class GridScript : MonoBehaviour
 	
 	void ResetMovementUpdateCountdown()
     {
+		// Set the interval
+		m_fMovementUpdateInterval = Mathf.Max(minimumMovementTimeInterval, 1.0f / (m_scriptCongoHead.GetNumSurvivors () * 0.5f));
+
         // Reset to currnet time interval
         m_fMovementUpdateCountdown = m_fMovementUpdateInterval;
+
+		// Set animation speeds
+		m_scriptCongoHead.SetWalkingSpeed (m_fMovementUpdateInterval);
     }
 
     public Vector2 GridToRenderPosition(Vector2 i_vGridPosition)
@@ -166,7 +174,10 @@ public class GridScript : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {
+	{
+		//print ("Player GO pos: " + m_pCongaHeadSurvivor.transform.position);
+		//print ("Player script pos in grid: " + m_scriptCongoHead.m_vGridPosition);
+
 		PollInput();
 
         if (m_fMovementUpdateCountdown > 0.0f)
@@ -179,12 +190,15 @@ public class GridScript : MonoBehaviour
                 ResetMovementUpdateCountdown();
             }
 		}
-		
+
 		// Focus camera on the head survivor
 		if (m_pCongaHeadSurvivor)
 		{
 			Vector3 cameraTranslation = m_pCongaHeadSurvivor.transform.position - mainCamera.transform.position;
-			mainCamera.transform.Translate (cameraTranslation.x, cameraTranslation.y, 0);
+			if (cameraTranslation.x != 0 || cameraTranslation.y != 0)
+			{
+				mainCamera.transform.Translate (cameraTranslation.x, cameraTranslation.y, 0);
+			}
 		}
     }
 
@@ -222,6 +236,17 @@ public class GridScript : MonoBehaviour
 		}
 
 		// Debug controls
+		if (Input.GetKey ("q")) 
+		{
+			// Attack animation
+			m_scriptCongoHead.animator.SetBool("Is Attacking", true);
+		}
+		if (Input.GetKey ("e")) 
+		{
+			// Attack animation
+			m_scriptCongoHead.animator.SetBool("Is Attacking", false);
+		}
+
 		if (Input.GetKey("z"))
 		{
 			// Spawn Zombie

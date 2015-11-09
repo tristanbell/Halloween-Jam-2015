@@ -55,6 +55,18 @@ public class SurvivorScript : GridObject
 		// Move us
 		base.Move ();
 	}
+
+	public int GetNumSurvivors()
+	{
+		if (survivorBack) 
+		{
+			return 1 + survivorBack.GetComponent<SurvivorScript> ().GetNumSurvivors ();
+		} 
+		else 
+		{
+			return 1;
+		}
+	}
 	
 	// Update is called once per frame
 	protected void Update () 

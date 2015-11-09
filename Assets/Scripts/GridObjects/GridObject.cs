@@ -14,11 +14,11 @@ public class GridObject : MonoBehaviour
 {
 	private bool m_bShouldMove = false;
 	private EDirection m_eMovementDirection = EDirection.NONE;
-	private Vector2 m_vGridPosition = new Vector2 (0, 0);
+	public Vector2 m_vGridPosition = new Vector2 (0, 0);
 	
 	public GameObject gridObject;
 	
-	protected Animator animator;
+	public Animator animator;
 	
 	protected void Start()
 	{
@@ -28,6 +28,14 @@ public class GridObject : MonoBehaviour
 	public void DoMovement ()
 	{
 		Move ();
+	}
+
+	public void SetWalkingSpeed(float i_fTimeUntilUpdate)
+	{
+		if (animator)
+		{
+			animator.speed = Mathf.Min(1.0f / (i_fTimeUntilUpdate * 0.5f), 3);
+		}
 	}
 	
 	public Vector2 GetPosition ()
@@ -43,11 +51,12 @@ public class GridObject : MonoBehaviour
 	public void SetDirection (EDirection i_eNewDirection)
 	{
 		m_eMovementDirection = i_eNewDirection;
-		
+
 		if (animator) 
 		{
 			// Set the animation
-			switch (GetDirection ()) {
+			switch (GetDirection ()) 
+			{
 			case EDirection.DOWN:
 				animator.SetInteger("Direction", 0);
 				break;
@@ -63,7 +72,7 @@ public class GridObject : MonoBehaviour
 			}
 		}
 	}
-	
+		
 	public EDirection GetDirection ()
 	{
 		return m_eMovementDirection;
@@ -171,6 +180,8 @@ public class GridObject : MonoBehaviour
 
 	public void Update()
 	{
-
+		GridScript gridScript = gridObject.GetComponent<GridScript>();
+		Vector2 newPos = m_vGridPosition;
+		transform.localPosition = newPos * gridScript.tileSize;
 	}
 }
