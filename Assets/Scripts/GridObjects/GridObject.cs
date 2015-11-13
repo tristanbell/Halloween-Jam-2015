@@ -34,7 +34,7 @@ public class GridObject : MonoBehaviour
 	{
 		if (animator)
 		{
-			animator.speed = Mathf.Min(1.0f / (i_fTimeUntilUpdate * 0.5f), 3);
+			animator.speed = Mathf.Min(0.25f / (i_fTimeUntilUpdate * 0.5f), 3);
 		}
 	}
 	
@@ -77,6 +77,10 @@ public class GridObject : MonoBehaviour
 	{
 		return m_eMovementDirection;
 	}
+
+	public void OnHitWall()
+	{
+	}
 	
 	protected void Move ()
 	{
@@ -116,7 +120,7 @@ public class GridObject : MonoBehaviour
 		if (gridScript.get_collision ((int)suggestedPosition.x, (int)suggestedPosition.y))
 		{
 			// We have hit a wall; do nothing. TODO: Die upon hitting a wall
-			print ("Wall!");
+			OnHitWall();
 		} 
 		else 
 		{

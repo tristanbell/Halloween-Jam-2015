@@ -29,9 +29,9 @@ public class GridScript : MonoBehaviour
 	public GameObject heroPrefab;
 	public GameObject survivorMalePrefab;
 	public GameObject survivorFemalePrefab;
-	public GameObject zombiePrefab;
-
-
+	public GameObject zombieMalePrefab;
+	public GameObject zombieFemalePrefab;
+	
     ////////////////////////////////////////////////////////////////////
     // Private values
 	////////////////////////////////////////////////////////////////////
@@ -50,10 +50,13 @@ public class GridScript : MonoBehaviour
     // Countdown to movement update
     private float m_fMovementUpdateInterval;
     private float m_fMovementUpdateCountdown;
-
+	private bool m_bIsPaused;
+	
     // Use this for initialization
     void Start()
     {
+		m_bIsPaused = false;
+
         // Init camera
         Vector2 cameraPosition = GridToRenderPosition(new Vector2(width / 2, height / 2));
         mainCamera.transform.position.Set(cameraPosition.x, cameraPosition.y, 0);
@@ -118,14 +121,43 @@ public class GridScript : MonoBehaviour
 		return pixel_color.r > 0.5f;
 	}
 
-	private Vector2 GetRandomSpawnPosition()
+	private Vector2 GetRandomSpawnPosition(bool i_bSpawnInSight = false)
 	{
-		return validSpawnPoints[Random.Range (0, validSpawnPoints.Count)];
+		if (i_bSpawnInSight)
+		{
+			// Find random points until one lies in sight (within camera screen point)
+			Vector2 point = validSpawnPoints[Random.Range (0, validSpawnPoints.Count)];
+			Vector3 screenPoint = mainCamera.WorldToScreenPoint(point / tileSize);
+			
+			//while (!(screenPoint.x > 0.0F && screenPoint.x < 1.0F && screenPoint.y > 0.0F && screenPoint.y < 1.0F))
+			while (!IsWithinSight (point))
+			{
+				point = validSpawnPoints[Random.Range (0, validSpawnPoints.Count)];
+			}
+			
+			return point;
+		}
+		else
+		{
+			return validSpawnPoints[Random.Range (0, validSpawnPoints.Count)];
+		}
+	}
+
+	private bool IsWithinSight(Vector2 i_vPoint)
+	{
+		int iRangeRadius = 8;
+		Vector2 vPlayerGridPos = m_scriptCongoHead.GetPosition ();
+
+		return i_vPoint.x > vPlayerGridPos.x - iRangeRadius
+			&& i_vPoint.x < vPlayerGridPos.x + iRangeRadius
+			&& i_vPoint.y > vPlayerGridPos.y - iRangeRadius
+			&& i_vPoint.y < vPlayerGridPos.y + iRangeRadius;
+
 	}
 	
 	public GameObject SpawnSurvivorRandom()
 	{
-		Vector2 gridPos = GetRandomSpawnPosition();
+		Vector2 gridPos = GetRandomSpawnPosition(true);
 		return SpawnSurvivor(gridPos);
 	}
 
@@ -141,7 +173,7 @@ public class GridScript : MonoBehaviour
 	
 	void SpawnZombie(Vector2 gridPos)
 	{
-		GameObject newZombie = (GameObject) Instantiate(zombiePrefab, GridToRenderPosition(gridPos), Quaternion.identity);
+		GameObject newZombie = (GameObject) Instantiate(Random.Range (0, 2) == 0 ? zombieMalePrefab : zombieFemalePrefab, GridToRenderPosition(gridPos), Quaternion.identity);
 		
 		newZombie.GetComponent<ZombieScript> ().SetPosition (gridPos);
 		newZombie.GetComponent<ZombieScript> ().gridObject = gameObject;
@@ -150,14 +182,14 @@ public class GridScript : MonoBehaviour
 	
 	void SpawnZombieRandom()
 	{
-		Vector2 gridPos = GetRandomSpawnPosition();
+		Vector2 gridPos = GetRandomSpawnPosition(true);
 		SpawnZombie(gridPos);
 	}
 	
 	void ResetMovementUpdateCountdown()
     {
 		// Set the interval
-		m_fMovementUpdateInterval = Mathf.Max(minimumMovementTimeInterval, 1.0f / (m_scriptCongoHead.GetNumSurvivors () * 0.5f));
+		m_fMovementUpdateInterval = Mathf.Max(minimumMovementTimeInterval, initialMovementTimeInterval / (m_scriptCongoHead.GetNumSurvivors () * 0.5f));
 
         // Reset to currnet time interval
         m_fMovementUpdateCountdown = m_fMovementUpdateInterval;
@@ -175,29 +207,27 @@ public class GridScript : MonoBehaviour
     // Update is called once per frame
     void Update()
 	{
-		//print ("Player GO pos: " + m_pCongaHeadSurvivor.transform.position);
-		//print ("Player script pos in grid: " + m_scriptCongoHead.m_vGridPosition);
+		if (!m_bIsPaused) {
+			//print ("Player GO pos: " + m_pCongaHeadSurvivor.transform.position);
+			//print ("Player script pos in grid: " + m_scriptCongoHead.m_vGridPosition);
 
-		PollInput();
+			PollInput ();
 
-        if (m_fMovementUpdateCountdown > 0.0f)
-        {
-            m_fMovementUpdateCountdown -= Time.deltaTime;
+			if (m_fMovementUpdateCountdown > 0.0f) {
+				m_fMovementUpdateCountdown -= Time.deltaTime;
 
-            if (m_fMovementUpdateCountdown <= 0.0f)
-            {
-                OnMovementUpdate();
-                ResetMovementUpdateCountdown();
-            }
-		}
+				if (m_fMovementUpdateCountdown <= 0.0f) {
+					OnMovementUpdate ();
+					ResetMovementUpdateCountdown ();
+				}
+			}
 
-		// Focus camera on the head survivor
-		if (m_pCongaHeadSurvivor)
-		{
-			Vector3 cameraTranslation = m_pCongaHeadSurvivor.transform.position - mainCamera.transform.position;
-			if (cameraTranslation.x != 0 || cameraTranslation.y != 0)
-			{
-				mainCamera.transform.Translate (cameraTranslation.x, cameraTranslation.y, 0);
+			// Focus camera on the head survivor
+			if (m_pCongaHeadSurvivor) {
+				Vector3 cameraTranslation = m_pCongaHeadSurvivor.transform.position - mainCamera.transform.position;
+				if (cameraTranslation.x != 0 || cameraTranslation.y != 0) {
+					mainCamera.transform.Translate (cameraTranslation.x, cameraTranslation.y, 0);
+				}
 			}
 		}
     }
@@ -246,11 +276,17 @@ public class GridScript : MonoBehaviour
 			// Attack animation
 			m_scriptCongoHead.animator.SetBool("Is Attacking", false);
 		}
-
+		
 		if (Input.GetKey("z"))
 		{
 			// Spawn Zombie
 			SpawnZombieRandom();
+		}
+		
+		if (Input.GetKey("l"))
+		{
+			// Spawn Survivor
+			SpawnSurvivorRandom();
 		}
 		
 		if (Input.GetKey("x"))
@@ -262,6 +298,12 @@ public class GridScript : MonoBehaviour
 		if (Input.GetKey("c"))
 		{
 			// Infect a random survivor in the conga line
+		}
+
+		if (Input.GetKey ("v"))
+		{
+			// Game over - simulate death.
+			m_scriptCongoHead.OnHitWall();
 		}
     }
 }

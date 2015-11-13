@@ -1,0 +1,20 @@
+ZNAKE
+
+1: Game over! Start again
+2. Zombie dies
+3: Survivor infected
+	-> 1 in 3 updates, adjacent survivors become infected
+
+Head collision with wall: 1
+Head collision with zombie (front): 1
+Head collision with zombie (side): 2
+Head collision with zombie (back): 2
+
+Zombie collision with survivor: 3
+
+Slow down the zombies
+	1 in 2 updates?
+	1 in 3?
+	
+Decide upon max movement speed
+Decide upon max animation speed

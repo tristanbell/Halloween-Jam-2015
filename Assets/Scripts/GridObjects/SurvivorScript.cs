@@ -42,6 +42,15 @@ public class SurvivorScript : GridObject
 	{
 		Move ();
 	}
+	
+	public void OnHitWall()
+	{
+		if (this.tag == "Player")
+		{
+			// End the game
+
+		}
+	}
 
 	protected void Move()
 	{
@@ -123,13 +132,30 @@ public class SurvivorScript : GridObject
 				AddSurvivor();
 
 				// Now remove survivor (coll.gameObject.tag) from the world
+				Destroy (coll.gameObject);
             }
         }
 
         // Zombie collision
         if (coll.gameObject.tag == "Zombie")
         {
-            SetState(ESurvivorState.Infected);
+			// If zombie is facing us, we are infected. Otherwise, we kill it.
+			EDirection eZombieToUs = DirectionFromTo(coll.gameObject, this.gameObject);
+
+			if (coll.gameObject.GetComponent<ZombieScript>().GetDirection () == eZombieToUs)
+			{
+            	this.SetState(ESurvivorState.Infected);
+
+				// TODO: Change to infected spritesheet
+			}
+			else
+			{
+				// Animate the attack
+				animator.SetBool("Is Attacking", true);
+
+				// Remove zombie from the world.
+				Destroy (coll.gameObject);
+			}
         }
 	}
 }
