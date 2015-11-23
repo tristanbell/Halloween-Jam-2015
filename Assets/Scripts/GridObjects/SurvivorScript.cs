@@ -16,6 +16,8 @@ public class SurvivorScript : GridObject
     // A conga line of survivors have a front and back survivor pointer
     GameObject survivorBack = null;
 
+	public bool m_bIsStranded = false;
+
     public void SetState(ESurvivorState i_eNewState)
     {
         // If we're infected
@@ -129,10 +131,13 @@ public class SurvivorScript : GridObject
         {
 			if (coll.gameObject.tag == "Survivor") // Player hits survivor
             {
-				AddSurvivor();
+				if (coll.gameObject.GetComponent<SurvivorScript>().m_bIsStranded)
+				{
+					AddSurvivor();
 
-				// Now remove survivor (coll.gameObject.tag) from the world
-				Destroy (coll.gameObject);
+					// Now remove survivor (coll.gameObject.tag) from the world
+					Destroy (coll.gameObject);
+				}
             }
         }
 

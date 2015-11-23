@@ -158,7 +158,9 @@ public class GridScript : MonoBehaviour
 	public GameObject SpawnSurvivorRandom()
 	{
 		Vector2 gridPos = GetRandomSpawnPosition(true);
-		return SpawnSurvivor(gridPos);
+		GameObject survivor = SpawnSurvivor(gridPos);
+		survivor.GetComponent<SurvivorScript>().m_bIsStranded = true;
+		return survivor;
 	}
 
 	public GameObject SpawnSurvivor(Vector2 gridPos)
